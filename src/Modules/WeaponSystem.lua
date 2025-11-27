@@ -86,22 +86,49 @@ local result = workspace:Raycast(origin, finalDir * weapon.range, raycastParams)
 
 return {
 weaponId = weaponId,
+origin = origin,
+direction = finalDir,
 position = result and result.Position or (origin + finalDir * weapon.range),
 hit = result and result.Instance or nil,
 distance = result and result.Distance or weapon.range,
 }
 end
 
--- Server-side validation: trust distance + check humanoid
+-- Server-side validation: recompute raycast and cadence server-side
 function WeaponSystem:ServerValidateShot(player: Player, shotData)
-local weapon = self.Weapons[shotData.weaponId]
+local weaponId = shotData and shotData.weaponId
+local weapon = weaponId and self.Weapons[weaponId]
 if not weapon then
 return
 end
-local target = shotData.hit
-if target and target.Parent then
-local humanoid = target.Parent:FindFirstChildOfClass("Humanoid")
-if humanoid and shotData.distance <= weapon.range + 5 then
+
+-- Enforce cadence/ammo server-side to prevent client spam.
+if not self:CanFire(player, weaponId) then
+return
+end
+self:ConsumeAmmo(player, weaponId)
+
+local character = player.Character
+local head = character and character:FindFirstChild("Head")
+local aimDirection = shotData.direction
+if not (head and typeof(aimDirection) == "Vector3" and aimDirection.Magnitude > 0) then
+return
+end
+
+local origin = head.Position
+if shotData.origin and (shotData.origin - origin).Magnitude <= 8 then
+origin = shotData.origin
+end
+
+local raycastParams = RaycastParams.new()
+raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+raycastParams.FilterDescendantsInstances = {character}
+
+local result = workspace:Raycast(origin, aimDirection.Unit * weapon.range, raycastParams)
+if result and result.Instance then
+local targetParent = result.Instance.Parent
+local humanoid = targetParent and targetParent:FindFirstChildOfClass("Humanoid")
+if humanoid then
 humanoid:TakeDamage(weapon.damage)
 end
 end

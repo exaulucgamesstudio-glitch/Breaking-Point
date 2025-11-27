@@ -63,7 +63,7 @@ Workspace
 
 ## 5. Gameplay Systems (Résumé technique)
 - **Contrôleur TPS** : mouvements (marche/course/saut/accroupi), caméra 3e personne (offset, collision), couverture via `CoverNodes` tagués (réduction hitbox + précision ennemie). 
-- **Tir & Armes** : `WeaponSystem:GetWeaponData(id)`, `ClientFire`, `ServerValidateShot`. Recul caméra léger, dispersion cône. 
+- **Tir & Armes** : `WeaponSystem:GetWeaponData(id)`, `ClientFire`, `ServerValidateShot` (raycast serveur). Recul caméra léger, dispersion cône.
 - **IA** : Waypoints (Parts dans `Workspace/Waypoints`). Vision = angle/distance + raycast. États simples, pas de pathfinding lourd. 
 - **Furtivité** : jauge montée par détection raycast; accroupi réduit multiplicateur. Échec → alerte ou fail selon mission. 
 - **Dialogue** : data table par scène, choix 2–4 options, callbacks + flags (ex: `FabienTrust`). 

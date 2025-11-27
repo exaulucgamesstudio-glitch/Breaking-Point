@@ -55,7 +55,7 @@ Weapons = {
   - `WeaponSystem:GetWeaponData(id)`
   - `WeaponSystem:CanFire(player)` (cadence / reload)
   - `WeaponSystem:ClientFire(player, weaponId, origin, direction)` → Raycast local + VFX.
-  - `WeaponSystem:ServerValidateShot(player, weaponId, hitPart, distance)` → applique dégâts.
+  - `WeaponSystem:ServerValidateShot(player, shotData)` → recalcule le raycast serveur et applique les dégâts si le résultat correspond.
 
 ### 1.4 EnemyAI (serveur)
 - **États** : `"Idle" | "Patrol" | "Alert" | "Combat"`
